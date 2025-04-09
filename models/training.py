@@ -37,12 +37,6 @@ def train(model: ASLModel, datamodule: L.LightningDataModule, logger: WandbLogge
     )
 
     trainer.fit(model, datamodule=datamodule)
-
-    for checkpoint in filter(lambda c: isinstance(c, ModelCheckpoint), all_callbacks):
-        artifact = wandb.Artifact(name=checkpoint.monitor, description=f"{checkpoint.monitor} checkpoints", type="model")
-        artifact.add_dir(checkpoint.dirpath)
-        wandb.run.log_artifact(artifact)
-
     wandb.finish()
 
 
