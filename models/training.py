@@ -6,14 +6,23 @@ from lightning.pytorch.callbacks import LearningRateMonitor, ModelCheckpoint, Ea
 
 from .asl_model import ASLModel
 
+ENTITY_NAME = "dspro2-silent-speech"
 PROJECT_NAME = "silent-speech"
+
 MAX_EPOCHS = 200
 
 
-def train(run_name: str, model: ASLModel, datamodule: L.LightningDataModule, callbacks: list[L.Callback] = None, seed: int = 42):
-    L.seed_everything(seed)
+def train(model: ASLModel, datamodule: L.LightningDataModule, logger: WandbLogger, callbacks: list[L.Callback] = None, seed: int = 42):
+    """Trains the model using the given datamodule and logger.
+    Args:
+        model (ASLModel): The model to train.
+        datamodule (L.LightningDataModule): The datamodule containing the training and validation data.
+        logger (WandbLogger): The logger to use for logging metrics.
+        callbacks (list[L.Callback], optional): List of callbacks to use during training. Defaults to None.
+        seed (int, optional): Seed for reproducibility. Defaults to 42.
+    """
 
-    logger = WandbLogger(name=run_name, project=PROJECT_NAME)
+    L.seed_everything(seed)
 
     all_callbacks = get_default_callbacks()
     if callbacks is not None:
@@ -44,3 +53,17 @@ def get_default_callbacks():
         EarlyStopping(monitor=ASLModel.VALID_ACCURACY, patience=5, verbose=True, mode="max"),
         EarlyStopping(monitor=ASLModel.TRAIN_ACCURACY, patience=5, verbose=True, mode="max"),
     ]
+
+
+def sweep(sweep_config: dict, count: int, training_procedure):
+    """Starts a W&B sweep with the given configuration and count.
+
+    Args:
+        sweep_config (dict): The configuration for the sweep.
+        count (int): The number of runs to execute.
+        training_procedure (function): The function to run for each sweep run. Should setup the model for the training based on the sweep configuratio accessible by wandb.config.
+    """
+
+    sweep_id = wandb.sweep(sweep=sweep_config, project=PROJECT_NAME, entity=ENTITY_NAME)
+    wandb.agent(sweep_id=sweep_id, function=training_procedure, count=count)
+    wandb.teardown()
