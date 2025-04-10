@@ -44,6 +44,7 @@ def get_default_callbacks():
     return [
         LearningRateMonitor(logging_interval="step", log_momentum=True, log_weight_decay=True),
         ModelCheckpoint(monitor=ASLModel.VALID_ACCURACY, filename="{epoch:02d}-{valid_accuracy:.2f}", save_top_k=3, mode="max"),
+        ModelCheckpoint(moonitor="epoch", filename="latest-{epoch:02d}", save_top_k=1, mode="max"),
         EarlyStopping(monitor=ASLModel.VALID_ACCURACY, patience=5, verbose=True, mode="max"),
         EarlyStopping(monitor=ASLModel.TRAIN_ACCURACY, patience=5, verbose=True, mode="max"),
     ]
