@@ -7,7 +7,7 @@ from enum import Enum
 TYPE = "type"
 
 
-class OptimizerType(Enum):
+class OptimizerType:
     ADAM = "adam"
     ADAMW = "adamw"
     RMSPROP = "rmsprop"
@@ -33,7 +33,7 @@ def get_optimizer(optimizer_params: dict, model: nn.Module):
         return torch.optim.RMSprop(model.parameters(), lr=learning_rate, weight_decay=weight_decay, momentum=momentum)
 
 
-class LearningRateSchedulerType(Enum):
+class LearningRateSchedulerType:
     NONE = "none"
     STEP = "step"
     EXPONENTIAL = "exponential"
