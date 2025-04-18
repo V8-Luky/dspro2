@@ -62,8 +62,14 @@ class RandomNoiseBackgroundTransform(RandomBackgroundTransform):
         """Applies a random noise background to the image based on the mask."""
 
         noise = np.random.uniform(0, 255, size=img.shape).astype(np.uint8)
+        noise = np.zeros_like(img)
 
-        img_with_noise = img * mask / 255 + noise * (255 - mask / 255)
+        mask = np.expand_dims(mask, -1)
+        print(mask.shape)
+        print((img * mask / 255).shape)
+        
+        img_with_noise = np.astype(img * (mask / 255) + noise * ((255 - mask) / 255), np.uint8)
+        
         img_with_noise = cv.GaussianBlur(img_with_noise, (3, 3), 1.5)
         return img_with_noise
 
@@ -78,6 +84,8 @@ class RandomRealLifeBackgroundTransform(RandomBackgroundTransform):
 
         background = np.random.choice(self.backgrounds)
         background = cv.resize(background, (img.shape[1], img.shape[0]))
+        
+        mask = np.expand_dims(mask, -1)
 
-        img_with_bg_replacement = img * mask / 255 + background * (255 - mask / 255)
+        img_with_bg_replacement = np.astype(img * (mask / 255) + background * ((255 - mask) / 255), np.uint8)
         return img_with_bg_replacement
