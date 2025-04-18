@@ -15,13 +15,13 @@ import kornia.geometry.transform as KGT
 class ExtractHand(nn.Module):
     def __init__(self):
         super().__init__()
-        self.hsv_min = torch.tensor([0.0, 0.0, 0.4])[None, :, None, None]
-        self.hsv_max = torch.tensor([2 * kornia.pi, 0.3, 1.0])[None, :, None, None]
+        self.hsv_min = torch.tensor([0.0, 0.0, 0.4])[:, None, None]
+        self.hsv_max = torch.tensor([2 * kornia.pi, 0.3, 1.0])[:, None, None]
 
     def forward(self, img):
         img_hsv = kornia.color.rgb_to_hsv(img)
         mask = ((img_hsv >= self.hsv_min.to(img.device)) &
-                (img_hsv <= self.hsv_max.to(img.device))).all(dim=1, keepdim=True).float()
+                (img_hsv <= self.hsv_max.to(img.device))).all(dim=0, keepdim=True).float()
 
         hand_mask = 1.0 - mask
 
@@ -31,13 +31,13 @@ class ExtractHand(nn.Module):
 class RandomBackgroundBase(nn.Module):
     def __init__(self, hsv_min, hsv_max):
         super().__init__()
-        self.hsv_min = hsv_min[None, :, None, None]
-        self.hsv_max = hsv_max[None, :, None, None]
+        self.hsv_min = hsv_min[:, None, None]
+        self.hsv_max = hsv_max[:, None, None]
 
     def _get_background_mask(self, img):
         hsv = kornia.color.rgb_to_hsv(img)
         mask = ((hsv >= self.hsv_min.to(img.device)) &
-                (hsv <= self.hsv_max.to(img.device))).all(dim=1, keepdim=True).float()
+                (hsv <= self.hsv_max.to(img.device))).all(dim=0, keepdim=True).float()
         return mask
 
 
