@@ -1,84 +1,73 @@
 import cv2 as cv
 import numpy as np
+import torch
 import torch.nn as nn
-import torchvision.transforms.v2 as transforms
+from torchvision.io import decode_image
 
 from PIL import Image
 
-
-def _get_mask(img, hsv_min, hsv_max):
-    """Gets a mask for the background on the image."""
-    image_hsv = cv.cvtColor(img, cv.COLOR_RGB2HSV)
-    return cv.inRange(image_hsv, hsv_min, hsv_max)
+import kornia
+import kornia.filters as KF
+import torch.nn.functional as F
+import kornia.geometry.transform as KGT
 
 
 class ExtractHand(nn.Module):
-    """Extracts the hand from the image using a mask based on HSV color space.
-
-    This transform should only be used on images obtained from the https://www.kaggle.com/datasets/kapillondhe/american-sign-language 
-    dataset.
-    """
-
-    def forward(self, img):
-        img_np = np.array(img)
-        hand_filter = self._get_hand_filter(img_np)
-        hand_only_image = self._apply_mask(img_np, hand_filter)
-        return Image.fromarray(hand_only_image)
-
-    def _get_hand_filter(self, img):
-        """Gets a mask for the hand on the image."""
-        bg_mask = _get_mask(img, np.array([0, 0, 100]), np.array([180, 60, 255]))
-        hand_mask = cv.bitwise_not(bg_mask)
-        return cv.GaussianBlur(hand_mask, (3, 3), 3)
-
-    def _apply_mask(self, img, mask):
-        """Applies a random noise background to the image based on the mask."""
-
-        black = np.zeros_like(img)
-        mask = np.expand_dims(mask, -1)
-
-        hand_only_image = np.astype(img * (mask / 255), np.uint8)
-        return hand_only_image
-
-
-class RandomBackground(nn.Module):
-    def __init__(self, background_filter_hsv: tuple[np.ndarray] = (np.array([0, 0, 0]), np.array([180, 5, 5])), *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.background_filter_hsv = background_filter_hsv
+    def __init__(self):
+        super().__init__()
+        self.hsv_min = torch.tensor([0.0, 0.0, 0.4])[None, :, None, None]
+        self.hsv_max = torch.tensor([2 * kornia.pi, 0.3, 1.0])[None, :, None, None]
 
     def forward(self, img):
-        img_np = np.array(img)
-        img_with_background = self._apply_background(img_np, self._get_background_filter(img_np) == 255)
-        return Image.fromarray(img_with_background)
+        img_hsv = kornia.color.rgb_to_hsv(img)
+        mask = ((img_hsv >= self.hsv_min.to(img.device)) &
+                (img_hsv <= self.hsv_max.to(img.device))).all(dim=1, keepdim=True).float()
 
-    def _apply_background(self, img, mask):
-        raise NotImplementedError("This class is an abstract class and should not be used directly.")
+        hand_mask = 1.0 - mask
 
-    def _get_background_filter(self, img):
-        """Gets a mask for the background on the image."""
-        return _get_mask(img, self.background_filter_hsv[0], self.background_filter_hsv[1])
+        return img * hand_mask
 
 
-class RandomBackgroundNoise(RandomBackground):
-    def _apply_background(self, img, mask):
-        """Applies a random noise background to the image based on the mask."""
+class RandomBackgroundBase(nn.Module):
+    def __init__(self, hsv_min, hsv_max):
+        super().__init__()
+        self.hsv_min = hsv_min[None, :, None, None]
+        self.hsv_max = hsv_max[None, :, None, None]
 
-        noise = np.random.uniform(0, 255, size=img.shape).astype(np.uint8)
-        img[mask] = noise[mask]
-        return cv.GaussianBlur(img, (3, 3), 1.5)
+    def _get_background_mask(self, img):
+        hsv = kornia.color.rgb_to_hsv(img)
+        mask = ((hsv >= self.hsv_min.to(img.device)) &
+                (hsv <= self.hsv_max.to(img.device))).all(dim=1, keepdim=True).float()
+        return mask
 
 
-class RandomRealLifeBackground(RandomBackground):
+class RandomBackgroundNoise(RandomBackgroundBase):
+    def __init__(self):
+        super().__init__(
+            hsv_min=torch.tensor([0.0, 0.0, 0.0]),
+            hsv_max=torch.tensor([2 * kornia.pi, 0.02, 0.02])
+        )
 
-    def __init__(self, backgrounds: list[str], background_filter_hsv: tuple[np.ndarray] = (np.array([0, 0, 0]), np.array([180, 5, 5])), *args, **kwargs):
-        super().__init__(background_filter_hsv, *args, **kwargs)
-        self.backgrounds = [cv.cvtColor(cv.imread(background), cv.COLOR_BGR2RGB) for background in backgrounds]
+    def forward(self, img):
+        mask = self._get_background_mask(img)
 
-    def _apply_background(self, img, mask):
-        """Applies a random real-life background to the image based on the mask."""
-        background_idx = np.random.randint(0, len(self.backgrounds))
-        background = self.backgrounds[background_idx]
+        noise = torch.rand_like(img)
+        return img * (1.0 - mask) + noise * mask
 
-        background = cv.resize(background, (img.shape[0], img.shape[1]))
-        img[mask] = background[mask]
-        return cv.GaussianBlur(img, (3, 3), 1.5)
+
+class RandomRealLifeBackground(RandomBackgroundBase):
+    def __init__(self, backgrounds: list[str]):
+        super().__init__(
+            hsv_min=torch.tensor([0.0, 0.0, 0.0]),
+            hsv_max=torch.tensor([2 * kornia.pi, 0.02, 0.02])
+        )
+        self.backgrounds = [decode_image(bg, mode="RGB").float() / 255.0 for bg in backgrounds]
+
+    def forward(self, img):
+        mask = self._get_background_mask(img)
+
+        idx = torch.randint(0, len(self.backgrounds), (1,), device=img.device)
+        selected_bg = self.backgrounds[idx]
+        selected_bg = KGT.resize(selected_bg, img.shape[-2:])
+
+        return img * (1.0 - mask) + selected_bg * mask

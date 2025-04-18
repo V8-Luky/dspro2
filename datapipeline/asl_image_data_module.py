@@ -33,6 +33,8 @@ class DefaultImageNetTransforms():
 
         return transforms.Compose([
             transforms.Resize((img_size, img_size)),
+            transforms.ToImage(),
+            transforms.ToDtype(torch.float32, scale=True),
             transforms.RandomHorizontalFlip(p=0.5),
             ExtractHand(),
             transforms.ColorJitter(brightness=0.75, contrast=0.3, saturation=0.75, hue=0.35),
@@ -40,8 +42,6 @@ class DefaultImageNetTransforms():
             transforms.RandomPerspective(distortion_scale=0.5, p=0.5),
             transforms.RandomChoice([RandomBackgroundNoise(), RandomRealLifeBackground(
                 backgrounds=self.get_background_images())], p=noise_vs_background_probability),
-            transforms.ToImage(),
-            transforms.ToDtype(torch.float32, scale=True),
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])  # ImageNet stats
         ])
     
