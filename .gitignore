@@ -174,3 +174,6 @@ cython_debug/
 # Custom rules
 /data/**
 !/data/.gitkeep
+
+# Weights and Biases
+/wandb
