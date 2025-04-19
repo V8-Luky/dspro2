@@ -21,7 +21,7 @@ class ExtractHand(nn.Module):
     def forward(self, img):
         img_hsv = kornia.color.rgb_to_hsv(img)
         mask = ((img_hsv >= self.hsv_min.to(img.device)) &
-                (img_hsv <= self.hsv_max.to(img.device))).all(dim=0, keepdim=True).float()
+                (img_hsv <= self.hsv_max.to(img.device))).all(dim=-3, keepdim=True).float()
 
         hand_mask = 1.0 - mask
 
@@ -37,7 +37,7 @@ class RandomBackgroundBase(nn.Module):
     def _get_background_mask(self, img):
         hsv = kornia.color.rgb_to_hsv(img)
         mask = ((hsv >= self.hsv_min.to(img.device)) &
-                (hsv <= self.hsv_max.to(img.device))).all(dim=0, keepdim=True).float()
+                (hsv <= self.hsv_max.to(img.device))).all(dim=-3, keepdim=True).float()
         return mask
 
 
