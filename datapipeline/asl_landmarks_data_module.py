@@ -7,14 +7,13 @@ import numpy as np
 
 
 class ASLLandmarksDataModule(L.LightningDataModule):
-    def __init__(self, path: str, train_split_folder: str = "Train", val_split_folder: str = "Validation", test_split_folder: str = "Test", batch_size: int = 32):
+    def __init__(self, path: str, train_split_folder: str = "Train", val_split_folder: str = "Valid", test_split_folder: str = "Test", batch_size: int = 32):
         super().__init__()
         self.path = path
         self.train_split_folder = train_split_folder
         self.valid_split_folder = val_split_folder
         self.test_split_folder = test_split_folder
         self.batch_size = batch_size
-
 
     def setup(self, stage: str):
        
