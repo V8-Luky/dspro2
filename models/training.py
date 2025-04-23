@@ -61,7 +61,7 @@ def sweep(sweep_config: dict, count: int, training_procedure):
     Args:
         sweep_config (dict): The configuration for the sweep.
         count (int): The number of runs to execute.
-        training_procedure (function): The function to run for each sweep run. Should setup the model for the training based on the sweep configuratio accessible by wandb.config.
+        training_procedure (function): The function to run for each sweep run. Should setup the model for the training based on the sweep configuration accessible by wandb.config.
     """
 
     sweep_id = wandb.sweep(sweep=sweep_config, project=PROJECT_NAME, entity=ENTITY_NAME)

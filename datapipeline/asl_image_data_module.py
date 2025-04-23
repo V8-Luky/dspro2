@@ -6,7 +6,7 @@ from torch.utils.data import Dataset, DataLoader
 
 
 class ASLImageDataModule(L.LightningDataModule):
-    def __init__(self, path: str, transforms, train_split_folder: str = "Train", val_split_folder: str = "Valid", test_split_folder: str = "Test", batch_size: int = 32):
+    def __init__(self, path: str, transforms, train_split_folder: str = "Train", val_split_folder: str = "Validation", test_split_folder: str = "Test", batch_size: int = 32):
         super().__init__()
         self.path = path
         self.train_split_folder = train_split_folder
@@ -24,10 +24,10 @@ class ASLImageDataModule(L.LightningDataModule):
             self.test_dataset = datasets.ImageFolder(root=f"{self.path}/{self.test_split_folder}", transform=self.transforms)
 
     def train_dataloader(self):
-        return DataLoader(self.train_dataset, batch_size=self.batch_size)
+        return DataLoader(self.train_dataset, batch_size=self.batch_size, num_workers=64) # added n° workers
 
     def val_dataloader(self):
-        return DataLoader(self.valid_dataset, batch_size=self.batch_size)
+        return DataLoader(self.valid_dataset, batch_size=self.batch_size, num_workers=64)
 
     def test_dataloader(self):
-        return DataLoader(self.test_dataset, batch_size=self.batch_size)
+        return DataLoader(self.test_dataset, batch_size=self.batch_size, num_workers=64)
