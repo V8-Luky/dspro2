@@ -15,6 +15,7 @@ class OptimizerType:
 
 OPTIMIZER = "optimizer"
 LEARNING_RATE = "learning_rate"
+FINETUNE_LEARNING_RATE = "finetune_learning_rate"
 WEIGHT_DECAY = "weight_decay"
 MOMENTUM = "momentum"
 
@@ -31,6 +32,25 @@ def get_optimizer(optimizer_params: dict, model: nn.Module):
     elif optimizer == OptimizerType.RMSPROP:
         momentum = optimizer_params[MOMENTUM]
         return torch.optim.RMSprop(model.parameters(), lr=learning_rate, weight_decay=weight_decay, momentum=momentum)
+
+def get_optimizer_with_finetune_group(optimizer_params: dict, model: nn.Module) -> torch.optim.Optimizer:
+    optimizer = optimizer_params[TYPE]
+    learning_rate = optimizer_params[LEARNING_RATE]
+    finetune_learning_rate = optimizer_params[FINETUNE_LEARNING_RATE]    
+    weight_decay = optimizer_params[WEIGHT_DECAY]
+
+    parameters = [
+        {"params": model.get_finetune_params(), "lr": finetune_learning_rate},
+        {"params": model.get_main_params(), "lr": learning_rate},
+    ]
+
+    if optimizer == OptimizerType.ADAM:
+        return torch.optim.Adam(parameters, weight_decay=weight_decay)
+    elif optimizer == OptimizerType.ADAMW:
+        return torch.optim.AdamW(parameters, weight_decay=weight_decay)
+    elif optimizer == OptimizerType.RMSPROP:
+        momentum = optimizer_params[MOMENTUM]
+        return torch.optim.RMSprop(parameters, weight_decay=weight_decay, momentum=momentum)
 
 
 class LearningRateSchedulerType:

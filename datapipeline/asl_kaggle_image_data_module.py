@@ -20,7 +20,7 @@ class ASLKaggleImageDataModule(ASLImageDataModule):
     DATASET_ROOT = "ASL_Dataset"
     CACHE_ENVIRON = "KAGGLEHUB_CACHE"
 
-    def __init__(self, path: str, train_transforms=DEFAULT_TRANSFORMS.TRAIN, valid_transforms=DEFAULT_TRANSFORMS.VALID, test_transforms=DEFAULT_TRANSFORMS.TEST, train_split_folder: str = "Train", val_split_folder: str = "Valid", test_split_folder: str = "Test", batch_size: int = 32, num_workers: int = 64):
+    def __init__(self, path: str, train_transforms=DEFAULT_TRANSFORMS.TRAIN_W_NOISE, valid_transforms=DEFAULT_TRANSFORMS.VALID_W_NOISE, test_transforms=DEFAULT_TRANSFORMS.TEST_W_NOISE, train_split_folder: str = "Train", val_split_folder: str = "Valid", test_split_folder: str = "Test", batch_size: int = 32, num_workers: int = 64):
         if path.endswith(ASLKaggleImageDataModule.DATASET_ROOT):
             path = "/".join(path.split("/")[:-1])
 

@@ -40,14 +40,13 @@ def train(model: ASLModel, datamodule: L.LightningDataModule, logger: WandbLogge
         devices="auto",
         max_epochs=MAX_EPOCHS,
         logger=logger,
-        log_every_n_steps=100,
         callbacks=all_callbacks
     )
 
     trainer.fit(model, datamodule=datamodule)
 
 
-def train_model(name_prefix: str, get_model: Callable[[dict], nn.Module], datamodule: L.LightningDataModule, seed: int = 42):
+def train_model(name_prefix: str, get_model: Callable[[dict], nn.Module], datamodule: L.LightningDataModule, get_optimizer: Callable[[dict, nn.Module], torch.optim.Optimizer] = get_optimizer, seed: int = 42):
     global run_id
     run_id += 1
 
@@ -102,4 +101,5 @@ def sweep(sweep_config: dict, count: int, training_procedure):
 
     sweep_id = wandb.sweep(sweep=sweep_config, project=PROJECT_NAME, entity=ENTITY_NAME)
     wandb.agent(sweep_id=sweep_id, function=training_procedure, count=count)
+    wandb.api.stop_sweep(sweep_id)
     wandb.teardown()
