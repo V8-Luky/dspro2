@@ -61,13 +61,17 @@ class RandomRealLifeBackground(RandomBackgroundBase):
             hsv_min=torch.tensor([0.0, 0.0, 0.0]),
             hsv_max=torch.tensor([2 * kornia.pi, 0.02, 0.02])
         )
-        self.backgrounds = [decode_image(bg, mode="RGB").float() / 255.0 for bg in backgrounds]
+        self.backgrounds = backgrounds
 
     def forward(self, img):
         mask = self._get_background_mask(img)
 
         idx = torch.randint(0, len(self.backgrounds), (1,), device=img.device)
-        selected_bg = self.backgrounds[idx]
-        selected_bg = KGT.resize(selected_bg, img.shape[-2:])
+        selected_bg = self._get_background(idx, img)
 
         return img * (1.0 - mask) + selected_bg * mask
+
+    def _get_background(self, idx, shape_like):
+        bg_path = self.backgrounds[idx]
+        bg = decode_image(bg_path, mode="RGB").float() / 255.0
+        return KGT.resize(bg, shape_like.shape[-2:])

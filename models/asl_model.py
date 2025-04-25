@@ -48,8 +48,8 @@ class ASLModel(L.LightningModule):
 
         metric(y_hat, y)
 
-        self.log(loss_name, loss, on_step=True, on_epoch=True)
-        self.log(metric_name, metric, on_step=True, on_epoch=True)
+        self.log(loss_name, loss)
+        self.log(metric_name, metric)
 
         return y_hat, loss
 
