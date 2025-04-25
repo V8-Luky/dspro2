@@ -6,13 +6,14 @@ import numpy as np
 
 
 class ASLLandmarksDataModule(L.LightningDataModule):
-    def __init__(self, path: str, train_split_folder: str = "Train", val_split_folder: str = "Validation", test_split_folder: str = "Test", batch_size: int = 32):
+    def __init__(self, path: str, train_split_folder: str = "Train", val_split_folder: str = "Validation", test_split_folder: str = "Test", batch_size: int = 32, num_workers: int = 64):
         super().__init__()
         self.path = path
         self.train_split_folder = train_split_folder
         self.valid_split_folder = val_split_folder
         self.test_split_folder = test_split_folder
         self.batch_size = batch_size
+        self.num_workers = num_workers
 
         self.mean = None
         self.max_distance = None
@@ -28,14 +29,14 @@ class ASLLandmarksDataModule(L.LightningDataModule):
         
 
     def train_dataloader(self):
-        return DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=True)
+        return DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=True, num_workers=self.num_workers)
 
     def val_dataloader(self):
-        return DataLoader(self.valid_dataset, batch_size=self.batch_size, shuffle=False)
+        return DataLoader(self.valid_dataset, batch_size=self.batch_size, shuffle=False, num_workers=self.num_workers)
 
 
     def test_dataloader(self):
-        return DataLoader(self.test_dataset, batch_size=self.batch_size, shuffle=False)
+        return DataLoader(self.test_dataset, batch_size=self.batch_size, shuffle=False, num_workers=self.num_workers)
 
         
     def load_asl_dataset(self, path, split, mean=None, max_distance=None, fit=False):
