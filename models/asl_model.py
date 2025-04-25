@@ -22,7 +22,7 @@ class ASLModel(L.LightningModule):
         self.train_accuracy = torchmetrics.classification.MulticlassAccuracy(num_classes=28, average="micro")
         self.valid_accuracy = torchmetrics.classification.MulticlassAccuracy(num_classes=28, average="micro")
         self.test_accuracy = torchmetrics.classification.MulticlassAccuracy(num_classes=28, average="micro")
-
+        
     def forward(self, x):
         return self.model(x)
 
