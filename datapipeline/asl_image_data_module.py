@@ -49,7 +49,7 @@ DEFAULT_TRANSFORMS = DefaultImageNetTransforms()
 
 
 class ASLImageDataModule(L.LightningDataModule):
-    def __init__(self, path: str, train_transforms=DEFAULT_TRANSFORMS.TRAIN, valid_transforms=DEFAULT_TRANSFORMS.VALID, test_transforms=DEFAULT_TRANSFORMS.TEST, train_split_folder: str = "Train", val_split_folder: str = "Valid", test_split_folder: str = "Test", batch_size: int = 32, num_workers: int = 64):
+    def __init__(self, path: str, train_transforms=DEFAULT_TRANSFORMS.TRAIN, valid_transforms=DEFAULT_TRANSFORMS.VALID, test_transforms=DEFAULT_TRANSFORMS.TEST, train_split_folder: str = "Train", val_split_folder: str = "Validation", test_split_folder: str = "Test", batch_size: int = 32, num_workers: int = 64):
         super().__init__()
         self.path = path
         self.train_split_folder = train_split_folder
