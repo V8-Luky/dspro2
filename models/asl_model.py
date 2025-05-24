@@ -1,5 +1,6 @@
 import lightning as L
 
+import torch
 import torchmetrics
 import torchmetrics.classification
 
@@ -37,9 +38,10 @@ class ASLModel(L.LightningModule):
         self._handle_step(batch, batch_idx, self.test_accuracy, ASLModel.TEST_LOSS, ASLModel.TEST_ACCURACY)
 
     def predict_step(self, batch, batch_idx):
-        x, _ = batch
+        x, y = batch
         y_hat = self(x)
-        return y_hat
+        y_pred = torch.argmax(y_hat, dim=-1)
+        return y_pred, y
 
     def _handle_step(self, batch, batch_idx: int, metric: torchmetrics.Metric, loss_name: str, metric_name: str):
         x, y = batch

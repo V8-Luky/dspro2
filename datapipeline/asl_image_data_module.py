@@ -4,9 +4,11 @@ import torch
 import torchvision.datasets as datasets
 import torchvision.transforms.v2 as transforms
 
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import DataLoader
 
 from .asl_transforms import ExtractHand, RandomBackgroundNoise, RandomRealLifeBackground
+
+IMG_SIZE = 224
 
 
 class DefaultImageNetTransforms():
@@ -39,10 +41,8 @@ class DefaultImageNetTransforms():
     def get_transforms(self, noise_vs_background_probability: list[float], background_split: str = SPLIT_TRAIN):
         assert len(noise_vs_background_probability) == 2, "noise_vs_background_probability should be a list of two floats"
 
-        img_size = 224
-
         return transforms.Compose([
-            transforms.Resize((img_size, img_size)),
+            transforms.Resize((IMG_SIZE, IMG_SIZE)),
             transforms.ToImage(),
             transforms.ToDtype(torch.float32, scale=True),
             ExtractHand(),

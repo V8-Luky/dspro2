@@ -3,9 +3,55 @@ import torch.nn as nn
 import lightning as L
 import wandb
 
+from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix
+
 from lightning.pytorch.loggers.wandb import WandbLogger
+import matplotlib.pyplot as plt
 
 from .asl_model import ASLModel
+
+LABELS = [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H",
+    "I",
+    "J",
+    "K",
+    "L",
+    "M",
+    "N",
+    "Nothing",
+    "O",
+    "P",
+    "Q",
+    "R",
+    "S",
+    "Space",
+    "T",
+    "U",
+    "V",
+    "W",
+    "X",
+    "Y",
+    "Z"
+]
+
+
+def show_confusion_matrix(targets: torch.Tensor, predictions: torch.Tensor, title: str, color_map: str = "Blues", display_labels: list[str] = LABELS):
+    cm = confusion_matrix(y_true=targets, y_pred=predictions)
+
+    fig, ax = plt.subplots(figsize=(10, 10))
+
+    display = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=display_labels)
+    display.plot(cmap=color_map, ax=ax, xticks_rotation="vertical")
+    display.ax_.set_title(title)
+
+    return fig, ax
 
 
 class Evaluation:
@@ -40,15 +86,23 @@ class Evaluation:
     def __call__(self):
         model = self.get_model()
 
-        logger = WandbLogger(name=self.name, log_model=True)
+        logger = WandbLogger(name=self.name)
 
         trainer = L.Trainer(
             accelerator="auto",
             devices="auto",
             logger=logger,
-            log_every_n_steps=100,
+            log_every_n_steps=1,
         )
 
         trainer.test(model, self.datamodule)
+        results = trainer.predict(model, self.datamodule)
+
+        preds, targets = [], []
+
+        for pred, target in results:
+            preds.append(pred)
+            targets.append(target)
 
         wandb.finish()
+        return torch.cat(preds), torch.cat(targets)
