@@ -1,3 +1,7 @@
+"""
+This module implements the evaluation logic for our ASL models.
+"""
+
 import torch
 import torch.nn as nn
 import lightning as L
@@ -43,6 +47,9 @@ LABELS = [
 
 
 def show_confusion_matrix(targets: torch.Tensor, predictions: torch.Tensor, title: str, color_map: str = "Blues", display_labels: list[str] = LABELS):
+    """
+    Displays a confusion matrix for the given targets and predictions.
+    """
     cm = confusion_matrix(y_true=targets, y_pred=predictions)
 
     fig, ax = plt.subplots(figsize=(10, 10))
@@ -55,6 +62,10 @@ def show_confusion_matrix(targets: torch.Tensor, predictions: torch.Tensor, titl
 
 
 class Evaluation:
+    """
+    Responsible for running and logging the evaluation for a given model architecture and datamodule.
+    """
+
     def __init__(
         self,
         name: str,

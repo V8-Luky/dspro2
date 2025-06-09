@@ -1,3 +1,7 @@
+"""
+This module implements various transformations for American Sign Language (ASL) data processing.
+"""
+
 import cv2 as cv
 import numpy as np
 import torch
@@ -13,6 +17,10 @@ import kornia.geometry.transform as KGT
 
 
 class ExtractHand(nn.Module):
+    """
+    Extracts the hand region from an image based on HSV color space.
+    """
+
     def __init__(self):
         super().__init__()
         self.hsv_min = torch.tensor([0.0, 0.0, 0.4])[:, None, None]
@@ -29,6 +37,10 @@ class ExtractHand(nn.Module):
 
 
 class RandomBackgroundBase(nn.Module):
+    """
+    Replaces the black background of an image with either noise or a real-life background.
+    """
+
     def __init__(self, hsv_min, hsv_max):
         super().__init__()
         self.hsv_min = hsv_min[:, None, None]
@@ -42,6 +54,10 @@ class RandomBackgroundBase(nn.Module):
 
 
 class RandomBackgroundNoise(RandomBackgroundBase):
+    """
+    Replaces the black background of an image with random noise.
+    """
+
     def __init__(self):
         super().__init__(
             hsv_min=torch.tensor([0.0, 0.0, 0.0]),
@@ -56,6 +72,10 @@ class RandomBackgroundNoise(RandomBackgroundBase):
 
 
 class RandomRealLifeBackground(RandomBackgroundBase):
+    """
+    Replaces the black background of an image with a randomly selected real-life background image.
+    """
+
     def __init__(self, backgrounds: list[str]):
         super().__init__(
             hsv_min=torch.tensor([0.0, 0.0, 0.0]),

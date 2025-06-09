@@ -4,7 +4,11 @@ import torch
 import torchmetrics
 import torchmetrics.classification
 
+
 class ASLModel(L.LightningModule):
+    """
+    A wrapper around any of our ASL classification models to unify the training, validation, and testing process.
+    """
     TRAIN_ACCURACY = "train_accuracy"
     VALID_ACCURACY = "valid_accuracy"
     TEST_ACCURACY = "test_accuracy"
@@ -23,7 +27,7 @@ class ASLModel(L.LightningModule):
         self.train_accuracy = torchmetrics.classification.MulticlassAccuracy(num_classes=28, average="micro")
         self.valid_accuracy = torchmetrics.classification.MulticlassAccuracy(num_classes=28, average="micro")
         self.test_accuracy = torchmetrics.classification.MulticlassAccuracy(num_classes=28, average="micro")
-        
+
     def forward(self, x):
         return self.model(x)
 
