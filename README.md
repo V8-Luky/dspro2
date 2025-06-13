@@ -1,6 +1,8 @@
 # Silent Speech
 In this data science project for the course Data Science Project 2 (DSPRO2) we try to use a neural network to classify sign language gestures. We'll be focusing on the letters of the American Sign Language (ASL). The goal of the project is to evaluate different approaches, likey convolutional neural networks, pretrained vision models and posedetection models, using MediaPipe.
 
+The training of the models can be found as Jupyter Notebooks in the root folder of this repository.
+
 ## Team
 - Luca Kyburz
 - Luca Niederer

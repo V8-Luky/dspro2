@@ -12,6 +12,9 @@ IMG_SIZE = 224
 
 
 class DefaultImageNetTransforms():
+    """
+    Provides the default transforms that we used for this project.
+    """
     SPLIT_TRAIN = "train"
     SPLIT_VALID = "validation"
     SPLIT_TEST = "test"
@@ -60,6 +63,10 @@ DEFAULT_TRANSFORMS = DefaultImageNetTransforms()
 
 
 class ASLImageDataModule(L.LightningDataModule):
+    """
+    The datamodule used to train our image classification models on the ASL dataset. Requires the dataset to be downloaded already.
+    """
+
     def __init__(self, path: str, train_transforms=DEFAULT_TRANSFORMS.TRAIN_W_NOISE, valid_transforms=DEFAULT_TRANSFORMS.VALID_W_NOISE, test_transforms=DEFAULT_TRANSFORMS.TEST_W_NOISE, train_split_folder: str = "Train", val_split_folder: str = "Validation", test_split_folder: str = "Test", batch_size: int = 32, num_workers: int = 64):
         super().__init__()
         self.path = path
