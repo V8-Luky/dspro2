@@ -146,7 +146,7 @@ try:
                 # Draw "No hand detected" in red in center of box
                 cv2.putText(
                     frame,
-                    "No hand detected",
+                    "No hand",
                     (cx1 + box_width // 4, cy1 + box_height // 2),
                     cv2.FONT_HERSHEY_SIMPLEX,
                     1.0,
