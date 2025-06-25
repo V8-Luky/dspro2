@@ -58,6 +58,14 @@ class DefaultImageNetTransforms():
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])  # ImageNet stats
         ])
 
+    def get_minimal_transforms(self):
+        return transforms.Compose([
+            transforms.Resize((IMG_SIZE, IMG_SIZE)),
+            transforms.ToImage(),
+            transforms.ToDtype(torch.float32, scale=True),
+            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+        ])
+
 
 DEFAULT_TRANSFORMS = DefaultImageNetTransforms()
 
