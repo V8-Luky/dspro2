@@ -15,4 +15,6 @@ The data used to train our models was taken from the [American Sign Language](ht
 For our test data we used a manually created dataset of 691 images of the same classes (hand gestures) as the [American Sign Language](https://www.kaggle.com/datasets/kapillondhe/american-sign-language) dataset.
 
 ## Client Application
-Along with our models we also wanted to provide a simple client application that can take our models and do real time classification on ASL signs.
+Along with our models we also wanted to provide a simple client application that can take our models and do real time classification on ASL signs. That app can be started by running the `app.py` file in the root folder of this repository. It implements the best performing model from our experiments, which was the *Improved ASL Classifier*.
+
+The `config.yaml` file in the root folder contains the configuration for the app. It can customize the app, by specifing the *capture speed*, the *mode* and the *fps*.
