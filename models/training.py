@@ -1,3 +1,5 @@
+"""This module contains the generic training logic for our models."""
+
 import torch.nn as nn
 import lightning as L
 import wandb
@@ -47,6 +49,7 @@ def train(model: ASLModel, datamodule: L.LightningDataModule, logger: WandbLogge
 
 
 def train_model(name_prefix: str, get_model: Callable[[dict], nn.Module], datamodule: L.LightningDataModule, get_optimizer: Callable[[dict, nn.Module], torch.optim.Optimizer] = get_optimizer, seed: int = 42):
+    """Trains a model using the given configuration and datamodule."""
     global run_id
     run_id += 1
 
@@ -78,6 +81,7 @@ def train_model(name_prefix: str, get_model: Callable[[dict], nn.Module], datamo
 
 
 def get_default_callbacks():
+    """The default callbacks we use in our experiments"""
     return [
         LearningRateMonitor(logging_interval="step", log_momentum=True, log_weight_decay=True),
         ModelCheckpoint(monitor=ASLModel.VALID_ACCURACY, filename="{epoch:02d}-{valid_accuracy:.2f}", save_top_k=3, mode="max"),
