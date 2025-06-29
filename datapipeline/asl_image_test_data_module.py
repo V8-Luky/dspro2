@@ -9,6 +9,10 @@ IMG_SIZE = 224
 
 
 class ASLImageTestDataModule(L.LightningDataModule):
+    """
+    The datamodule that provides our manual test dataset for the evaluation of our image classification models.
+    """
+
     def __init__(self, path: str, batch_size: int = 32, num_workers: int = 64):
         super().__init__()
         self.path = path

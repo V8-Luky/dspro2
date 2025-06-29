@@ -1,3 +1,5 @@
+"""This module provides some helper methods for running our experiments as Weights & Biases sweeps. This includes commonly used, tunable hyperparameters and the resolution of these hyperparameters to torch classes."""
+
 import torch
 import torch.nn as nn
 
@@ -21,6 +23,9 @@ MOMENTUM = "momentum"
 
 
 def get_optimizer(optimizer_params: dict, model: nn.Module):
+    """
+    Get the optimizer from a dictionary of parameters that comes from a Weights & Biases sweep.
+    """
     optimizer = optimizer_params[TYPE]
     learning_rate = optimizer_params[LEARNING_RATE]
     weight_decay = optimizer_params[WEIGHT_DECAY]
@@ -33,10 +38,14 @@ def get_optimizer(optimizer_params: dict, model: nn.Module):
         momentum = optimizer_params[MOMENTUM]
         return torch.optim.RMSprop(model.parameters(), lr=learning_rate, weight_decay=weight_decay, momentum=momentum)
 
+
 def get_optimizer_with_finetune_group(optimizer_params: dict, model: nn.Module) -> torch.optim.Optimizer:
+    """
+    Get the optimizer from a dictionary of parameters that comes from a Weights & Biases sweep, specifically for models that have a finetune group (a group of parameters with a different learning rate).
+    """
     optimizer = optimizer_params[TYPE]
     learning_rate = optimizer_params[LEARNING_RATE]
-    finetune_learning_rate = optimizer_params[FINETUNE_LEARNING_RATE]    
+    finetune_learning_rate = optimizer_params[FINETUNE_LEARNING_RATE]
     weight_decay = optimizer_params[WEIGHT_DECAY]
 
     parameters = [
@@ -54,6 +63,7 @@ def get_optimizer_with_finetune_group(optimizer_params: dict, model: nn.Module) 
 
 
 class LearningRateSchedulerType:
+    """The supported learning rate schedulers."""
     NONE = "none"
     STEP = "step"
     EXPONENTIAL = "exponential"
@@ -67,6 +77,9 @@ FACTOR = "factor"
 
 
 def get_learning_rate_scheduler(learning_rate_scheduler_params: dict, optimizer: torch.optim.Optimizer):
+    """
+    Get the learning rate scheduler from a dictionary of parameters that comes from a Weights & Biases sweep.
+    """
     learning_rate_scheduler = learning_rate_scheduler_params[TYPE]
     if learning_rate_scheduler == LearningRateSchedulerType.NONE:
         return None

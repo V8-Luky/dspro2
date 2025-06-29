@@ -1,0 +1,2 @@
+# Experiments
+This folder contains any sort of sandbox style experiments we did during the course of this project. This does not include the experiments where we trained the our models for the actual task.
